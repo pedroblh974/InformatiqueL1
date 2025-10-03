@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Website</title>
+<style>
+  body { font-family: Arial; margin:0; background:#f5f5f5; }
+  nav { background:#222; padding:5px; }
+  nav ul { list-style:none; display:flex; margin:0; padding:0; }
+  nav ul li { margin-right:20px; }
+  nav ul li a { color:white; text-decoration:none; cursor:pointer; }
+  .section { padding:50px; text-align:center; display:none; }
+  .active { display:block; }
+  input, textarea { width:100%; padding:10px; margin-bottom:0px; border:1px solid #ccc; border-radius:5px; }
+  button { padding:10px 20px; border:none; border-radius:5px; background:black; color:white; cursor:pointer; }
+  button:hover { background:#333; }
+  .message { margin-top:10px; font-size:14px; }
+  .success { color:green; }
+  .error { color:red; }
+  .profile-box { background:#fff; padding:20px; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.1); max-width:400px; margin:20px auto; text-align:left; }
+  .profile-box input { width:100%; margin-bottom:-30px; }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav>
+  <ul>
+    <li><a onclick="showSection('home')">Home</a></li>
+    <li><a href="Informatique.html">about</a></li>
+    <li><a onclick="showSection('services')">Services</a></li>
+    <li><a onclick="showSection('contact')">Contact</a></li>
+    <li><a id="nav-login" onclick="showSection('login')">Login</a></li>
+  </ul>
+</nav>
+
+<!-- Sections -->
+<div id="home" class="section active">
+  <h1>Welcome to Home</h1>
+  <p>هذه الصفحة الرئيسية</p>
+</div>
+
+<div id="about" class="section">
+  <h1>About Us</h1>
+  <p>معلومات عن الموقع</p>
+</div>
+
+<div id="services" class="section">
+  <h1>Services</h1>
+  <p>الخدمات التي نقدمها</p>
+</div>
+
+<!-- Contact Form -->
+<div id="contact" class="section">
+  <h2>Contact Us</h2>
+  <form id="contact-form">
+    <input type="text" id="from_name" placeholder="اكتب اسمك" required />
+    <input type="email" id="from_email" placeholder="اكتب بريدك" required />
+    <textarea id="message" placeholder="اكتب رسالتك" rows="5" required></textarea>
+    <button type="submit">إرسال</button>
+  </form>
+  <div class="message" id="form-message"></div>
+</div>
+
+<!-- Login / Profile -->
+<div id="login" class="section">
+  <div id="login-form-box">
+    <h2>Login</h2>
+    <input type="email" id="login-email" placeholder="Email" required />
+    <input type="password" id="login-password" placeholder="Password" required />
+    <button onclick="loginUser()">Login</button>
+    <div id="login-msg" class="message"></div>
+  </div>
+
+  <div id="profile-box" class="profile-box" style="display:none;">
+    <h3>Welcome, <span id="profile-name"></span></h3>
+    <input type="text" id="profile-newname" placeholder="Change Name" />
+    <input type="text" id="profile-phone" placeholder="Phone Number" />
+    <button onclick="updateProfile()">Update Profile</button>
+    <button onclick="logoutUser()">Logout</button>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script>
+  // Navigation
+  function showSection(id){
+    document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  // EmailJS Init
+  emailjs.init("-7Ssx6ACEzscALeHn");
+
+  // Contact Form
+  document.getElementById("contact-form").addEventListener("submit", function(e){
+    e.preventDefault();
+    emailjs.send("service_pkrxkc6", "template_iagrlzw", {
+      from_name: document.getElementById("from_name").value,
+      from_email: document.getElementById("from_email").value,
+      message: document.getElementById("message").value
+    }).then(function(){
+      document.getElementById("form-message").innerHTML = "<p class='success'>✅ رسالتك وصلت بنجاح!</p>";
+      document.getElementById("contact-form").reset();
+    }, function(error){
+      document.getElementById("form-message").innerHTML = "<p class='error'>❌ حدث خطأ أثناء الإرسال.</p>";
+      console.error(error);
+    });
+  });
+
+  // Login/Profile
+  let currentUser = null;
+
+  function loginUser(){
+    const email = document.getElementById("login-email").value;
+    const password = document.getElementById("login-password").value;
+
+    if(email && password){
+      currentUser = { name: email.split('@')[0], email: email, phone:'' };
+      document.getElementById("login-form-box").style.display = 'none';
+      document.getElementById("profile-box").style.display = 'block';
+      document.getElementById("profile-name").innerText = currentUser.name;
+      document.getElementById("nav-login").innerText = currentUser.name;
+    } else {
+      document.getElementById("login-msg").innerText = "Please enter email and password";
+    }
+  }
+
+  function updateProfile(){
+    const newName = document.getElementById("profile-newname").value;
+    const phone = document.getElementById("profile-phone").value;
+    if(newName) currentUser.name = newName;
+    if(phone) currentUser.phone = phone;
+    document.getElementById("profile-name").innerText = currentUser.name;
+    document.getElementById("nav-login").innerText = currentUser.name;
+    alert("Profile updated!");
+  }
+
+  function logoutUser(){
+    currentUser = null;
+    document.getElementById("login-form-box").style.display = 'block';
+    document.getElementById("profile-box").style.display = 'none';
+    document.getElementById("nav-login").innerText = "Login";
+  }
+
+</script>
+</body>
+</html
